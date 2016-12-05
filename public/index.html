@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html ng-app="easyBajao" lang="en-US">
+  <head>
+    <link rel="icon" type="image/png" href="/images/logo.png"/>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="Easy Bajao" name="title">
+    <meta content="Real time search. Cool way to make your playlist. Set quality for every video." name="description">
+    <meta content="easy bajao, bajao,youtube playlist, swatveer, swatantra, playlist, youtube, more, youtube more, interactive" name="keywords">
+    <meta content="Easy Bajao" property="og:title">
+    <meta content="website" property="og:type">
+    <meta content="http://easybajao.com/" property="og:url">
+    <meta content="Easy Bajao" property="og:site_name">
+    <meta property= "fb:app_id" content="702010536600364" >
+    <meta content="Real time search. Cool way to make your playlist. Set quality for every video." property="og:description">
+    <meta property="og:image" content="http://easybajao.com/images/logo.png" />
+    <title>Easy Bajao</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/ytScheduler.css">
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-69801189-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script type="text/javascript" src="/javascripts/angular.min.js"></script>
+
+  </head>
+
+  <body ng-controller="topController" id="topCont">
+    <!-- Fb share button -->
+    <div id="fb-root"></div>
+
+    <script>
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=702010536600364";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <!-- Fb share button ends -->
+
+    <!-- Social Media share links -->
+    <div style="position:absolute;top:10px;right:20px;z-index:10000;">
+      <table>
+        <tr>
+          <td style="padding-right:10px;">
+            <div class="fb-share-button" data-href="http://easybajao.com" data-layout="button_count"></div>
+          </td>
+          <td>
+            <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://easybajao.com/" data-text="Easy Bajao - Real time search. Cool way to make your playlist. Set quality for every video." data-via="swatveer">Tweet</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <!-- Social Media share links ends -->
+
+    <!-- Search controller div -->
+    <div class="navbar navbar-inverse navbar-fixed-top" ng-controller="searchController" id="nav_search" style="position:relative;">
+      <div class="container header-container">
+        <div class="navbar-header">
+          <div class="col-md-3">
+            <a class="navbar-brand" href="#">
+              <span style="font-family: 'Lobster', cursive; font-size:30px; color:#000;letter-spacing:2px;">Easy</span>
+              <span style="font-family: 'Lobster', cursive; font-size:30px; color:#e62117;letter-spacing:2px;">Bajao</span>
+            </a>
+          </div>
+          <div class="col-md-9">
+           <form class="navbar-form pull-left" role="search" style="width:inherit;">
+              <div class="input-group searchBoxHolder">
+                <span>
+                  <input id="searchBoxInput" type="text" class="form-control" placeholder="Search" dropdown-toggle ng-model="searchString" ng-change="searchVideoResults()" ng-disabled="disableSearch" autocomplete="off" onfocus="loadResultsIfNotEmpty()">
+                  <div ng-show="relatedVideosList.length > 0" style="position:absolute;background-color:#2d2d2d;z-index:1000;width:100%;top:35px;border:1px solid #fff;height:420px; overflow-y:scroll;">
+                    <div class="row separator topMg10" ng-repeat="video in relatedVideosList" style="margin-right:0px;margin-left:0px;">
+                      <div class="col-xs-12 col-sm-3 col-md-4" style="padding-right:0px;">
+                        <img class="clickable" ng-src="{{video.img}}" ng-click="changeVideo(video.id)">
+                      </div>
+                      <div class="col-xs-12 col-sm-9 col-md-8" style="padding:0px;">
+                        <div style="word-wrap:break-word;">
+                          <a href="#" ng-click="changeVideo(video.id)" ng-bind="video.title" class="search_video_title"></a>
+                          <div style="padding-top:5px;">
+                            <p class="lead" ng-show="sharedObj.queuedVideosList.length <= 50"><small><small class="clickable add_button_text" ng-click="selectVideo(video)">Add This Video</small></small></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Search Controller div ends -->
+
+
+    <div class="container-fluid" style="background-color:#000">
+      <!-- Contains Youtube player and related videos -->
+        <div class="row">
+          <div class="col-md-7">
+            <!-- Contains Youtube player -->
+            <div class="row">
+              <div style="background-color:#000;min-height:500px;">
+                <div class="col-md-12" style="line-height:500px;">
+                  <div id="player" style="vertical-align: middle;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Youtube player container ends -->
+
+            <!-- Queued Videos Button Container -->
+            <div class="row qCDiv" ng-controller="queuedVideosController" id='queuedContainer'>
+              <div class="col-md-6 text-left controls" id="qualityDiv">
+                <div class="btn-group" dropdown is-open="false">
+                  <button id="single-button" type="button" class="btn btn-sm btn-cool" dropdown-toggle ng-disabled="disabled" tooltip="Won't effect current playing video">
+                    Set Quality <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
+                    <li role="menuitem" ng-repeat="(key,value) in qualityList" ng-class="{true:'selected', false:''}[$index==selectedIndex]">
+                      <a href="#" ng-click="changeQuality(key,$index)">{{value}}</a>
+                    </li>
+                  </ul>
+                </div>
+                <button class="btn btn-sm btn-cool" ng-click="clearPlaylist()">Clear playlist</button>
+                <button class="btn btn-sm btn-cool" ng-click="playAgainPlaylist()">
+                  <input type="checkbox" ng-model="playAgainCheck"/>
+                  Play playlist again
+                </button>
+              </div>
+              <div class="col-md-4 text-center controls">
+                <button type="button" class="btn btn-cool" aria-label="Left Align" ng-click="prevVideo()" ng-disabled="sharedObj.currentVideo <= 1">
+                  <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-cool" aria-label="Left Align" ng-click="nextVideo()" ng-disabled=" sharedObj.currentVideo >= sharedObj.queuedVideosList.length">
+                  <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+                </button>
+              </div>
+
+            <!-- Queued Videos Container -->
+            <div class="row" style="margin-top:20px;">
+              <div class="col-md-12">
+                <div class="DocumentList" id="scrollDiv">
+                  <div class="text-center" style="padding-top:80px;" ng-show="sharedObj.queuedVideosList.length == 0">
+                    <p class="lead">
+                      Add songs to make your playlist.
+                    </p>
+                  </div> 
+                  <ul class="list-inline" ng-show="sharedObj.queuedVideosList.length >=1">
+                    <li class="DocumentItem" ng-repeat="video in sharedObj.queuedVideosList track by $index" ng-class="{true:'playingVideo', false:''}[video.id==sharedObj.currentVideoId]" id="qvideoContainer">
+                      <div class="row" style="white-space:normal;">
+                        <div class="col-md-12 text-center">
+                          <button type="button" class="btn btn-cool btn-sm" aria-label="Left Align" ng-click="removeVideo(video.id,$index)">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                          </button>
+                        </div>
+                        <div class="col-md-12 text-center">
+                          <img class="clickable" ng-src="{{video.img}}" ng-click="changeVideo(video.id,$index)">
+                        </div>
+                        <div class="col-md-12 text-center">
+                          <a href="#" ng-click="changeVideo(video.id,$index)" class="video_title">
+                            <small ng-bind="video.title"></small>
+                          </a>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            </div>
+            <!-- Queued videos container ends -->
+          </div>
+
+          <div class="col-md-5">
+            <!-- Related Videos container -->
+            <div class="row">
+              <div class="col-md-12 rCDiv" ng-controller="relatedVideosController">
+                <div class="row" style="padding-bottom:10px;">
+                  <div class="col-xs-12 col-md-12 text-center">
+                    <p class="lead related-text">
+                      Related Videos
+                    </p>
+                  </div>
+                </div>
+
+                <div class="rVDiv">
+                  <div class="row separator topMg10" ng-repeat="video in sharedObj.relatedVideos">
+                    <div class="col-xs-12 col-sm-3 col-md-4" style="padding-right:0px;">
+                      <img class="clickable" ng-src="{{video.img}}" ng-click="changeVideo(video.id)">
+                    </div>
+                    <div class="col-xs-12 col-sm-9 col-md-8" style="padding:0px;">
+                      <div style="word-wrap:break-word;">
+                        <a href="#" ng-click="changeVideo(video.id)" ng-bind="video.title" class="video_title"></a>
+                        <div style="padding-top:5px;">
+                          <p class="lead" ng-show="sharedObj.queuedVideosList.length <= 50">
+                            <small>
+                              <small class="clickable add_button_text" ng-click="addVideoToPlaylist(video)">
+                                Add To Playlist
+                              </small>
+                            </small>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Related Videos Container -->
+          </div>
+        </div>
+
+        <hr style="margin-bottom:0px;">
+
+        <footer class="footer">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <h4>Created By</h4>
+            <p class="lead"><a class="footer_link" href="https://www.facebook.com/swatveer" target="_blank">Swatantra Verma</a></p>
+          </div>
+
+          <div class="col-md-4 text-center">
+            <h4>Powered By</h4>
+            <p class="lead"><a class="footer_link" href="https://www.youtube.com" target="_blank">YouTube</a></p>
+          </div>
+
+          <div class="col-md-4 text-center">
+            <h4>Proudly hosted on</h4>
+            <p class="lead"><a class="footer_link" href="https://linode.com" target="_blank">Linode</a></p>
+          </div>
+        </div>
+      </footer>        
+    </div>
+
+    <!-- All scripts -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-animate.js"></script>
+    <script type="text/javascript" src="/javascripts/ui-bootstrap.min.js"></script>
+    <script type="text/javascript" src="/javascripts/ytScheduler.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://apis.google.com/js/client.js?onload=gapiInit" gapi_processed="true"></script>
+    <script>
+      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+    </script>
+  </body>
+</html>

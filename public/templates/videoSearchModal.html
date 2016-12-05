@@ -1,0 +1,30 @@
+<div class="modal-header">
+    <h3 class="modal-title">Search a Video</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+          <div class="form-group">
+              <input type="text" class="form-control" placeholder="Search Video" ng-model="searchString" ng-change="searchVideoResults()" autofocus>
+          </div>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+          <div class="row separator" ng-repeat="video in queuedVideosListResult">
+            <div class="col-md-2 text-left">
+              <img class="clickable" ng-src="{{video.img}}" ng-click="selectVideo(video)">
+            </div>
+          
+            <div class="col-md-6 text-left">
+              <a href="#" ng-click="selectVideo(video)">{{video.title}}</a>
+            </div>
+          </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
